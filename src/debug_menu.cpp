@@ -274,6 +274,7 @@ std::string enum_to_string<debug_menu::debug_menu_index>( debug_menu::debug_menu
         case debug_menu::debug_menu_index::VEHICLE_EXPORT: return "VEHICLE_EXPORT";
         case debug_menu::debug_menu_index::VEHICLE_DELETE: return "VEHICLE_DELETE";
         case debug_menu::debug_menu_index::VEHICLE_BATTERY_CHARGE: return "VEHICLE_BATTERY_CHARGE";
+        case debug_menu::debug_menu_index::VEHICLE_FORCE_FLYABLE: return "VEHICLE_FORCE_FLYABLE";
         case debug_menu::debug_menu_index::GENERATE_EFFECT_LIST: return "GENERATE_EFFECT_LIST";
         case debug_menu::debug_menu_index::ACTIVATE_EOC: return "ACTIVATE_EOC";
         case debug_menu::debug_menu_index::IMPORT_FOLLOWER: return "IMPORT_FOLLOWER";
@@ -1007,6 +1008,7 @@ static int vehicle_uilist()
 {
     std::vector<uilist_entry> uilist_initializer = {
         { uilist_entry( debug_menu_index::VEHICLE_BATTERY_CHARGE, true, 'b', _( "Change battery charge" ) ) },
+        { uilist_entry( debug_menu_index::VEHICLE_FORCE_FLYABLE, true, 'F', _( "Force flyable vehicle" ) ) },
         { uilist_entry( debug_menu_index::SPAWN_VEHICLE, true, 's', _( "Spawn a vehicle" ) ) },
         { uilist_entry( debug_menu_index::VEHICLE_DELETE, true, 'd', _( "Delete vehicle" ) ) },
         { uilist_entry( debug_menu_index::VEHICLE_EXPORT, true, 'e', _( "Export vehicle as prototype" ) ) },
@@ -3801,6 +3803,20 @@ static void vehicle_battery_charge()
     }
 }
 
+static void vehicle_force_flyable()
+{
+    map &here = get_map();
+
+    optional_vpart_position v_part_pos = here.veh_at( player_picks_tile() );
+    if( !v_part_pos ) {
+        add_msg( m_bad, _( "There's no vehicle there." ) );
+        return;
+    }
+
+    vehicle &veh = v_part_pos->vehicle();
+    veh.set_flyable(true);
+}
+
 static void vehicle_export()
 {
     map &here = get_map();
@@ -4461,6 +4477,10 @@ void debug()
 
         case debug_menu_index::VEHICLE_BATTERY_CHARGE:
             vehicle_battery_charge();
+            break;
+
+        case debug_menu_index::VEHICLE_FORCE_FLYABLE:
+            vehicle_force_flyable();
             break;
 
         case debug_menu_index::VEHICLE_DELETE: {
